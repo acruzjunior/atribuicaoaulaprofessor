@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulário de Aderência de Disciplinas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    input[type="checkbox"]:checked + span {
+      font-weight: bold;
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl">
+    <h1 class="text-2xl font-bold mb-4 text-center">Formulário de Aderência de Disciplinas</h1>
+    <p class="text-gray-600 mb-4 text-center">Preencha com seus dados e selecione as disciplinas nas quais você tem aderência.</p>
+
+    <form id="disciplinasForm" class="space-y-4" method="POST" action="https://formspree.io/f/meogyylp">
+      <input type="hidden" name="_subject" value="Nova resposta do Formulário de Aderência" />
+
+      <div>
+        <label for="nome" class="block text-sm font-medium text-gray-700">Nome completo</label>
+        <input type="text" id="nome" name="nome" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" />
+      </div>
+
+      <div>
+        <label for="formacao" class="block text-sm font-medium text-gray-700">Formações de Graduação</label>
+        <textarea id="formacao" name="formacao" required rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" placeholder="Ex: Engenharia Mecânica pela UNIFESP/UNIP/..., Licenciatura em Física pela UFSCar..."></textarea>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Seu e-mail (opcional)</label>
+        <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" />
+      </div>
+
+      <!-- Sistema de Busca (Melhoria 2) -->
+      <div class="mb-4">
+        <input type="text" id="buscaDisciplina" placeholder="Buscar disciplina..." 
+               class="w-full p-2 border rounded-md">
+      </div>
+
+      <!-- Contador de Disciplinas (Melhoria 5) -->
+      <div class="text-sm text-gray-500 mb-2">
+        <span id="contador">0</span> disciplinas selecionadas
+      </div>
+
+      <!-- Botão para alternar visualização (Melhoria 7) -->
+      <button type="button" id="toggleView" class="mb-2 text-sm text-blue-600">
+        Mostrar apenas selecionadas
+      </button>
+
+      <div class="grid grid-cols-1 gap-2 max-h-[500px] overflow-y-auto p-4 border border-gray-200 rounded bg-gray-50" id="disciplinasContainer">
+        <!-- Disciplinas serão inseridas aqui pelo JavaScript -->
+      </div>
+
+      <button type="submit" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+        Enviar
+      </button>
+
+      <p class="text-sm text-gray-500 mt-2 text-center">Você receberá uma confirmação por e-mail após o envio.</p>
+      
+      <!-- Créditos do desenvolvedor -->
+      <p class="text-xs text-gray-400 mt-4 text-center">Desenvolvido por Dr. Antonio Carlos de Oliveira Cruz Junior</p>
+    </form>
+  </div>
+
+  <script>
+    const disciplinas = [
+      "ADMINISTRAÇÃO DA PRODUÇÃO",
+      "ADMINISTRAÇÃO DE MATERIAIS",
+      "ADMINISTRAÇÃO DE UNIDADES DE ALIMENTAÇÃO E NUTRIÇÃO",
+      "ADMINISTRAÇÃO E ESCALABILIDADE EM BANCO DE DADOS",
+      "ALFABETIZAÇÃO E LETRAMENTO: FUNDAMENTOS E PROCESSOS",
+      "ALGORITMOS E PROGRAMAÇÃO",
+      "AMBIENTE, PODER E CULTURA: PERSPECTIVAS DA PSICOLOGIA SOCIAL",
+      "ANÁLISE BROMATOLÓGICA",
+      "ANÁLISE DE ALGORITMOS",
+      "ANÁLISE DE DEMONSTRAÇÕES FINANCEIRAS",
+      "ANÁLISE DE IMPACTOS E RISCOS DA CONSTRUÇÃO CIVIL",
+      "ANATOMIA APLICADA AO EXERCÍCIO",
+      "ANATOMIA BÁSICA",
+      "ANATOMIA DOS SISTEMAS",
+      "ARQUITETURA DE COMPUTADORES",
+      "ARTE E MUSICALIZAÇÃO",
+      "ARTE, CULTURA E EDUCAÇÃO",
+      "ATIVIDADE EXTENSIONISTA",
+      "ATIVIDADE EXTENSIONISTA I",
+      "ATIVIDADE EXTENSIONISTA II",
+      "ATIVIDADE FÍSICA PARA GRUPOS ESPECIAIS",
+      "ATIVIDADES AQUÁTICAS",
+      "ATIVIDADES DE ACADEMIA",
+      "ATIVIDADES FÍSICAS PARA CRIANÇAS E ADOLESCENTES",
+      "ATIVIDADES FÍSICAS PARA JOVENS E ADULTOS",
+      "AUDITORIA EM SAÚDE",
+      "AUTOMAÇÃO INDUSTRIAL",
+      "AVALIAÇÃO DE DESEMPENHO",
+      "AVALIAÇÃO EDUCACIONAL: FUNDAMENTOS, MÉTODOS E PROCESSOS",
+      "AVALIAÇÃO FINANCEIRA DE PROJETOS",
+      "AVALIAÇÃO FÍSICA E MOTORA",
+      "AVALIAÇÃO NUTRICIONAL E NUTRIÇÃO NOS CICLOS DE VIDA",
+      "AVALIAÇÃO PSICOLÓGICA I",
+      "AVALIAÇÃO PSICOLÓGICA II",
+      "BACTERIOLOGIA E VIROLOGIA CLÍNICA",
+      "BANCO DE DADOS",
+      "BASES, MÉTODOS E TÉCNICAS DE AVALIAÇÃO",
+      "BIOLOGIA BÁSICA",
+      "BIOLOGIA MOLECULAR",
+      "BIOQUÍMICA CLÍNICA",
+      "BIOQUÍMICA E BIOFÍSICA",
+      "BIOSSEGURANÇA E BIOÉTICA",
+      "BIOTECNOLOGIA",
+      "BROMATOLOGIA E COMPOSIÇÃO DOS ALIMENTOS",
+      "CÁLCULO DIFERENCIAL I",
+      "CÁLCULO DIFERENCIAL II",
+      "CÁLCULO ESTRUTURAL: CONCRETO ARMADO",
+      "CÁLCULO ESTRUTURAL: MADEIRA E METAL",
+      "CÁLCULO INTEGRAL",
+      "CÁLCULO NUMÉRICO",
+      "CIÊNCIA DOS MATERIAIS",
+      "CINESIOLOGIA E BIOMECÂNICA",
+      "CINESIOTERAPIA",
+      "CIRCUITOS",
+      "COACHING",
+      "COLETA E PROCESSAMENTO DE AMOSTRAS BIOLÓGICAS",
+      "COMÉRCIO ELETRÔNICO",
+      "COMPORTAMENTO DO CONSUMIDOR",
+      "COMPUTAÇÃO GRÁFICA E PROCESSAMENTO DE IMAGENS",
+      "COMUNICAÇÃO EM REDES SOCIAIS",
+      "CONSULTORIA EMPRESARIAL",
+      "CONTROLE DE QUALIDADE",
+      "CONTROLE DE QUALIDADE EM FARMÁCIA E COSMÉTICOS",
+      "CONTROLE E APRENDIZAGEM MOTORA",
+      "CONTROLE HIGIÊNICO E SANITÁRIO",
+      "COSMETOLOGIA E ESTÉTICA APLICADA A BIOMEDICINA",
+      "COSMETOLOGIA E SAÚDE ESTÉTICA APLICADAS À FARMÁCIA",
+      "CRESCIMENTO E DESENVOLVIMENTO",
+      "CRIAÇÃO 2D E 3D",
+      "CUIDADOS AO PROCESSO DE LUTO",
+      "CULTURA CORPORAL NA ESCOLA: CORPO, ARTE E MOVIMENTO",
+      "CURRÍCULO E ORGANIZAÇÃO PEDAGÓGICA",
+      "DEFICIÊNCIAS: FÍSICA E MENTAL",
+      "DEONTOLOGIA E NUTRIÇÃO",
+      "DESENHO TÉCNICO",
+      "DESENHO UNIVERSAL",
+      "DESENVOLVIMENTO DE APLICATIVOS",
+      "DESENVOLVIMENTO HUMANO NA INFÂNCIA E ADOLESCÊNCIA",
+      "DESENVOLVIMENTO HUMANO NA VIDA ADULTA E ENVELHECIMENTO",
+      "DESIGN DE GAMES",
+      "DESIGN DE SOFTWARE",
+      "DIDÁTICA E FORMAÇÃO DOCENTE",
+      "DINÂMICA E GESTÃO COM PESSOAS",
+      "DIREITOS HUMANOS",
+      "DISCIPLINA ELETIVA I",
+      "DISCIPLINA ELETIVA II",
+      "DISCIPLINAS",
+      "ECONOMIA DE EMPRESAS",
+      "EDUCAÇÃO CORPORATIVA",
+      "EDUCAÇÃO E NOVAS TECNOLOGIAS, METODOLOGIAS ATIVAS E LINGUAGENS DIGITAIS NA",
+      "EDUCAÇÃO EM ESPAÇOS NÃO ESCOLARES",
+      "EDUCAÇÃO FÍSICA ESCOLAR EM COMUNIDADES DISTINTAS",
+      "EDUCAÇÃO INCLUSIVA: DIDÁTICA, ESTRATÉGIA E RECURSOS EDUCACIONAIS PARA PESSOA",
+      "ELETRICIDADE APLICADA",
+      "ELETRÔNICA ANALÓGICA E DIGITAL",
+      "EMPREENDEDORISMO",
+      "ÊNFASE A1 = PROCESSOS CLÍNICOS OU",
+      "ÊNFASE B2 = PROCESSOS DE PREVENÇÃO E PROMOÇÃO DA SAÚDE",
+      "ENFERMAGEM EM CENTRO CIRÚRGICO, CENTRAL DE MATERIAIS E RECUPERAÇÃO PÓS-AN",
+      "ENFERMAGEM EM DOENÇAS TRANSMISSÍVEIS",
+      "ENFERMAGEM EM URGÊNCIA E EMERGÊNCIA",
+      "ENFERMAGEM NO CUIDADO AOS PACIENTES CRÍTICOS E SEMICRÍTICOS",
+      "ENFERMAGEM PRÉ-HOSPITALAR E HOME CARE",
+      "ENGENHARIA DE SOFTWARE",
+      "EPIDEMIOLOGIA E BIOESTATÍSTICA",
+      "ERGONOMIA DO TRABALHO",
+      "ERGONOMIA, ACESSIBILIDADE E SEGURANÇA DO TRABALHO",
+      "ESPORTES COLETIVOS TRADICIONAIS",
+      "ESPORTES DE REBATER",
+      "ESPORTES INDIVIDUAIS",
+      "ESTÁGIO ESPECÍFICO EM PSICOLOGIA I:",
+      "ESTÁGIO ESPECÍFICO EM PSICOLOGIA II:",
+      "ESTÁGIO ESPECÍFICO EM PSICOLOGIA III:",
+      "ESTÁGIO ESPECÍFICO EM PSICOLOGIA IV:",
+      "ESTÁGIO SUPERVISIONADO I",
+      "ESTÁGIO SUPERVISIONADO II",
+      "ESTÁGIO SUPERVISIONADO III",
+      "ESTÁGIO SUPERVISIONADO IV",
+      "ESTÁGIO SUPERVISIONADO: AVALIAÇÃO PSICOLÓGICA",
+      "ESTÁGIO SUPERVISIONADO: DISPOSITIVO DE ACOLHIMENTO PSICOLÓGICO",
+      "ESTÁGIO SUPERVISIONADO: PROCESSOS PSICANALÍTICOS",
+      "ESTÁGIO SUPERVISIONADO: PROMOÇÃO DE SAÚDE NO TRABALHO",
+      "ESTÁGIO SUPERVISIONADO: PSICOFARMACOLOGIA",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA DA SAÚDE",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA DO ESPORTE",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA EDUCACIONAL E ESCOLAR",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA HOSPITALAR",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA JURÍDICA",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA NA ADOLESCÊNCIA",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA NA INFÂNCIA",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA PARA ADULTOS",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA PARA IDOSOS",
+      "ESTÁGIO SUPERVISIONADO: PSICOLOGIA SOCIAL",
+      "ESTÁGIO SUPERVISIONADO: PSICOPATOLOGIA",
+      "ESTÁGIO SUPERVISIONADO: PSICOTERAPIA",
+      "ESTATÍSTICA APLICADA A PROCESSOS GERENCIAIS",
+      "ESTATÍSTICA APLICADA AO MARKETING",
+      "ESTRATÉGIA E ESTRUTURA ORGANIZACIONAL",
+      "ESTRATÉGIAS DE MARKETING",
+      "ESTRUTURA DE CARDÁPIOS",
+      "ESTRUTURA DE DADOS",
+      "ÉTICA, CIDADANIA E RESPONSABILIDADE NAS EMPRESAS",
+      "EXERCÍCIO FÍSICO E DOENÇAS CRÔNICO-DEGENERATIVAS",
+      "FARMÁCIA CLÍNICA",
+      "FARMÁCIA HOSPITALAR",
+      "FARMACOBOTÂNICA",
+      "FARMACOCINÉTICA",
+      "FARMACODINÂMICA I",
+      "FARMACODINÂMICA II",
+      "FARMACOGNOSIA",
+      "FARMACOLOGIA",
+      "FARMACOTÉCNICA I",
+      "FARMACOTÉCNICA II",
+      "FENÔMENOS DOS TRANSPORTES",
+      "FINANÇAS CORPORATIVAS",
+      "FINANÇAS PÚBLICAS",
+      "FÍSICA GERAL E EXPERIMENTAL: CALOR E FLUIDOS",
+      "FÍSICA GERAL E EXPERIMENTAL: CAMPO MAGNÉTICO, ÓPTICA E ONDULATÓRIA",
+      "FÍSICA GERAL E EXPERIMENTAL: MOVIMENTO",
+      "FÍSICO-QUÍMICA",
+      "FISIOLOGIA APLICADA",
+      "FISIOLOGIA BÁSICA",
+      "FISIOLOGIA DO EXERCÍCIO",
+      "FISIOTERAPIA CARDIOVASCULAR",
+      "FISIOTERAPIA DERMATOFUNCIONAL",
+      "FISIOTERAPIA EM GERIATRIA E GERONTOLOGIA",
+      "FISIOTERAPIA ESPORTIVA",
+      "FISIOTERAPIA MUSCULOESQUELÉTICA",
+      "FISIOTERAPIA NA ATENÇÃO BÁSICA",
+      "FISIOTERAPIA NA SAÚDE DO HOMEM E DA MULHER",
+      "FISIOTERAPIA NAS DISFUNÇÕES NEUROLÓGICAS",
+      "FISIOTERAPIA ORTOPÉDICA, TRAUMATOLÓGICA E REUMATOLÓGICA",
+      "FISIOTERAPIA PEDIÁTRICA",
+      "FISIOTERAPIA PNEUMOLÓGICA E REABILITAÇÃO",
+      "FISIOTERAPIA PREVENTIVA E ERGONOMIA",
+      "FISIOTERAPIA RESPIRATÓRIA E UNIDADE DE TERAPIA INTENSIVA",
+      "FITOTERAPIA",
+      "FORMAÇÃO DOCENTE: DESENVOLVIMENTO DE COMPETÊNCIAS SOCIOEMOCIONAIS",
+      "FUNDAÇÕES E ESTRUTURAS DE CONTENÇÃO",
+      "FUNDAMENTOS DE E-COMMERCE E E-BUSINESS",
+      "FUNDAMENTOS DE GESTÃO EMPRESARIAL",
+      "FUNDAMENTOS E ORGANIZAÇÃO DE ESPAÇOS NA EDUCAÇÃO INFANTIL",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DA EDUCAÇÃO FÍSICA",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DA LÍNGUA PORTUGUESA",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DA MATEMÁTICA",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DE ARTE",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DE CIÊNCIAS",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DE GEOGRAFIA",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO DE HISTÓRIA",
+      "FUNDAMENTOS E PRÁTICAS DE ENSINO MÉDIO",
+      "FUNDAMENTOS E PRÁTICAS DO ENSINO FUNDAMENTAL I",
+      "FUNDAMENTOS E PRÁTICAS DO ENSINO FUNDAMENTAL II",
+      "FUNDAMENTOS E PRÁTICAS DO ENSINO INFANTIL",
+      "FUNDAMENTOS EPISTEMOLÓGICOS DA PSICOLOGIA",
+      "FUNDAMENTOS HISTÓRICOS, FILOSÓFICOS E SOCIOLÓGICOS DA EDUCAÇÃO",
+      "FUTEBOL",
+      "GASTRONOMIA APLICADA À NUTRIÇÃO",
+      "GEOMETRIA ANALÍTICA E ÁLGEBRA LINEAR",
+      "GERENCIAMENTO ÁGIL DE PROJETOS DE SOFTWARE",
+      "GERENCIAMENTO DE CONTEÚDO WEB",
+      "GESTÃO DA INOVAÇÃO",
+      "GESTÃO DA QUALIDADE",
+      "GESTÃO DE PESSOAS",
+      "GESTÃO DE PROCESSOS ORGANIZACIONAIS",
+      "GESTÃO DE PROJETOS",
+      "GESTÃO DE SERVIÇOS EM SAÚDE",
+      "GESTÃO DE TRANSPORTE, SEGUROS E CONTROLE DE PREVENÇÃO A PERDAS",
+      "GESTÃO DOS RISCOS E SEGURANÇA DO TRABALHO",
+      "GESTÃO E LEGISLAÇÃO FARMACÊUTICA",
+      "GESTÃO ESCOLAR NA EDUCAÇÃO BÁSICA",
+      "GESTÃO PEDAGÓGICA",
+      "GINÁSTICAS",
+      "GOVERNANÇA EM TI",
+      "HEMATOLOGIA",
+      "HEMATOLOGIA CLÍNICA",
+      "HEMOTERAPIA E BANCO DE SANGUE",
+      "HIDROCINESIOTERAPIA",
+      "HIDROLOGIA E HIDRÁULICA",
+      "HISTOLOGIA",
+      "HISTOLOGIA E IMUNOLOGIA",
+      "HISTÓRIA DA EDUCAÇÃO",
+      "HISTÓRIA E EXERCÍCIO PROFISSIONAL",
+      "HISTÓRIA SOCIAL DA INFÂNCIA",
+      "HISTÓRIA, SOCIOLOGIA E ANTROPOLOGIA DA EDUCAÇÃO FÍSICA E ESPORTE",
+      "HUMANIZAÇÃO EM SAÚDE",
+      "IMAGENOLOGIA",
+      "IMUNOLOGIA",
+      "IMUNOLOGIA CLÍNICA",
+      "INOVAÇÕES E NOVAS TECNOLOGIAS EM SAÚDE",
+      "INSPEÇÃO E CONTROLE DE OBRAS",
+      "INSTALAÇÕES ELÉTRICAS E HIDRÁULICAS",
+      "INSTRUMENTAÇÃO E MEDIÇÃO",
+      "INTELIGÊNCIA ARTIFICIAL",
+      "INTERPRETAÇÃO CLÍNICO LABORATORIAL",
+      "INTERVENÇÕES EM SITUAÇÕES DE RISCO, EMERGÊNCIA E CATÁSTROFES",
+      "INTERVENÇÕES GRUPAIS",
+      "INTRODUÇÃO À ANÁLISE ESTRUTURAL",
+      "INTRODUÇÃO À CONTABILIDADE",
+      "JOGOS E BRINCADEIRAS",
+      "LEAN MANUFACTURING",
+      "LEGISLAÇÃO E POLÍTICAS PÚBLICAS EM EDUCAÇÃO FÍSICA E ESPORTE",
+      "LIDERANÇA E DESENVOLVIMENTO DE EQUIPES",
+      "LÍNGUA BRASILEIRA DE SINAIS - LIBRAS",
+      "LÍNGUA PORTUGUESA",
+      "LOGÍSTICA E CADEIA DE SUPRIMENTOS",
+      "LOGÍSTICA REVERSA",
+      "LUTAS",
+      "MANIFESTAÇÕES ESPORTIVAS E ALTERNATIVAS",
+      "MANIFESTAÇÕES RÍTMICAS EXPRESSIVAS",
+      "MARKETING DIGITAL",
+      "MATEMÁTICA BÁSICA",
+      "MATEMÁTICA E ESTATÍSTICA BÁSICA",
+      "MATEMÁTICA FINANCEIRA",
+      "MATERIAIS DE ENGENHARIA",
+      "MATERIAIS: CONCRETO E AÇO",
+      "MATERIAIS: MADEIRA E CERÂMICA",
+      "MECÂNICA DOS SÓLIDOS",
+      "MECÂNICA DOS SOLOS E OBRAS DA TERRA",
+      "MEIO AMBIENTE E SUSTENTABILIDADE",
+      "MERCADO FINANCEIRO",
+      "METODOLOGIA DA PESQUISA CIENTÍFICA",
+      "MÉTODOS DE TOMADA DE DECISÃO",
+      "METROLOGIA E ENSAIOS",
+      "MICROBIOLOGIA CLÍNICA",
+      "MICROBIOLOGIA E CITOLOGIA CLÍNICA",
+      "MICROPROCESSADORES E MICROCONTROLADORES",
+      "MOBILE MARKETING",
+      "MODAIS DE TRANSPORTE",
+      "MUSCULAÇÃO",
+      "NEUROANATOMIA FUNCIONAL",
+      "NEUROCIÊNCIA E COMPORTAMENTO",
+      "NOVOS MATERIAIS NA CONSTRUÇÃO CIVIL: APLICAÇÃO RENOVÁVEL E SUSTENTÁVEL",
+      "NUTRIÇÃO APLICADA À ATIVIDADE FÍSICA",
+      "NUTRIÇÃO APLICADA À ENFERMAGEM",
+      "NUTRIÇÃO CLÍNICA E DOENÇAS NUTRICIONAIS E ENDÓCRINAS",
+      "NUTRIÇÃO DIETÉTICA E GUIAS ALIMENTARES",
+      "NUTRIÇÃO MATERNO-INFANTIL",
+      "ORGANIZAÇÃO DE EVENTOS ESPORTIVOS",
+      "PARASITOLOGIA CLÍNICA",
+      "PATOLOGIA",
+      "PAVIMENTAÇÃO ASFÁLTICA",
+      "PEDAGOGIA EMPRESARIAL",
+      "PEDAGOGIA HOSPITALAR",
+      "PEDAGOGIA SOCIAL",
+      "PESQUISA OPERACIONAL",
+      "PLANEJAMENTO DE MARKETING",
+      "PLANEJAMENTO DE TRANSPORTES: FERROVIAS, PORTOS E AEROPORTOS",
+      "PLANEJAMENTO ESTRATÉGICO DE VENDAS",
+      "PLANEJAMENTO, ENSAIO E USO DE SOLOS",
+      "POLÍTICA EDUCACIONAL, ESTRUTURA E ORGANIZAÇÃO DA EDUCAÇÃO BÁSICA",
+      "POLÍTICAS PÚBLICAS DE SAÚDE",
+      "PONTES, TÚNEIS E ELEMENTOS PROTENDIDOS",
+      "PRÁTICAS DA EDUCAÇÃO DE JOVENS E ADULTOS",
+      "PRÁTICAS PEDAGÓGICAS I",
+      "PRÁTICAS PEDAGÓGICAS II",
+      "PRÁTICAS PEDAGÓGICAS III",
+      "PRÁTICAS PEDAGÓGICAS IV",
+      "PRÁTICAS PEDAGÓGICAS V",
+      "PRÁTICAS PEDAGÓGICAS VI",
+      "PRÁTICAS PEDAGÓGICAS VII",
+      "PRÁTICAS PEDAGÓGICAS VIII",
+      "PRIMEIROS SOCORROS",
+      "PRINCÍPIOS E POLÍTICAS DA EDUCAÇÃO AMBIENTAL",
+      "PROBLEMAS DE APRENDIZAGEM",
+      "PROCEDIMENTOS INJETÁVEIS EM BIOMEDICINA ESTÉTICA",
+      "PROCESSO DO CUIDAR: PRÁTICA CLÍNICA",
+      "PROCESSO DO CUIDAR: PROCEDIMENTOS E TÉCNICAS",
+      "PROCESSO DO CUIDAR: SEMIOLOGIA E SEMIOTÉCNICA",
+      "PROCESSOS ANALÍTICOS COMPORTAMENTAIS",
+      "PROCESSOS CLÍNICOS",
+      "PROCESSOS DE FABRICAÇÃO",
+      "PROCESSOS DO CUIDAR",
+      "PROCESSOS FENOMENOLÓGICOS E EXISTENCIAIS",
+      "PROCESSOS PSICANALÍTICOS I",
+      "PROCESSOS PSICANALÍTICOS II",
+      "PROCESSOS PSICOLÓGICOS BÁSICOS",
+      "PROGRAMAÇÃO ORIENTADA A OBJETOS",
+      "PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS",
+      "PROGRAMAÇÃO PARA INTERNET",
+      "PROJETO DE INDÚSTRIA 4.0",
+      "PROJETO DE MOVIMENTAÇÃO E ARMAZENAGEM DE MATERIAIS",
+      "PROJETO DE SOFTWARE",
+      "PROJETO MULTIDISCIPLINAR FINAL",
+      "PROJETO MULTIDISCIPLINAR FINAL I",
+      "PROJETO MULTIDISCIPLINAR FINAL II",
+      "PROJETO MULTIDISCIPLINAR I",
+      "PROJETO MULTIDISCIPLINAR II",
+      "PROJETO MULTIDISCIPLINAR III",
+      "PROJETO MULTIDISCIPLINAR IV",
+      "PROJETO MULTIDISCIPLINAR V",
+      "PROJETO MULTIDISCIPLINAR VI",
+      "PROJETO MULTIDISCIPLINAR VII",
+      "PROJETOS E TRAÇADOS DE ESTRADAS E RODOVIAS",
+      "PROJETOS EDUCACIONAIS E PROJETO PEDAGÓGICO DA ESCOLA",
+      "PRÓTESE E ÓRTESE",
+      "PROTOTIPAÇÃO WEB",
+      "PSICOFARMACOLOGIA",
+      "PSICOLOGIA APLICADA À SAÚDE",
+      "PSICOLOGIA DA APRENDIZAGEM INFANTIL",
+      "PSICOLOGIA DA EDUCAÇÃO",
+      "PSICOLOGIA DA SAÚDE",
+      "PSICOLOGIA DO DESENVOLVIMENTO E DO ESPORTE",
+      "PSICOLOGIA DO DESENVOLVIMENTO E PROBLEMAS DE APRENDIZAGEM",
+      "PSICOLOGIA DO ESPORTE",
+      "PSICOLOGIA E ATENÇÃO À SAÚDE",
+      "PSICOLOGIA E O MUNDO DIGITAL",
+      "PSICOLOGIA EDUCACIONAL E ESCOLAR",
+      "PSICOLOGIA HOSPITALAR",
+      "PSICOLOGIA JURÍDICA",
+      "PSICOLOGIA NOS CUIDADOS PALIATIVOS",
+      "PSICOLOGIA ORGANIZACIONAL E DO TRABALHO",
+      "PSICOLOGIA SOCIAL",
+      "PSICOLOGIA, DIVERSIDADE E CONTEMPORANEIDADE",
+      "PSICOMOTRICIDADE",
+      "PSICOPATOLOGIA",
+      "PSICOTERAPIA",
+      "PUBLICIDADE, PROPAGANDA E DESIGN",
+      "QUALIDADE: CONTROLE ESTATÍSTICO DO PROCESSO",
+      "QUÍMICA ANALÍTICA QUALITATIVA",
+      "QUÍMICA FARMACÊUTICA E INOVAÇÃO",
+      "QUÍMICA GERAL E INORGÂNICA",
+      "QUÍMICA GERAL E TECNOLÓGICA",
+      "QUÍMICA ORGÂNICA",
+      "QUÍMICA ORGÂNICA APLICADA",
+      "RACIOCÍNIO CLÍNICO NA ASSISTÊNCIA NUTRICIONAL",
+      "RECREAÇÃO E LAZER",
+      "RECRUTAMENTO E SELEÇÃO",
+      "RECURSOS COMPUTACIONAIS NO PROCESSO DE ENSINO APRENDIZAGEM",
+      "RECURSOS TERAPÊUTICOS MANUAIS",
+      "REDES DE COMPUTADORES",
+      "REMUNERAÇÃO E BENEFÍCIOS: PLANO DE CARGOS, SALÁRIOS E DESENVOLVIMENTO",
+      "RESISTÊNCIA DOS MATERIAIS",
+      "ROTULAGEM DE ALIMENTOS",
+      "SANEAMENTO",
+      "SAÚDE DA CRIANÇA",
+      "SAÚDE DA CRIANÇA: ASSISTÊNCIA DE ENFERMAGEM",
+      "SAÚDE DA MULHER",
+      "SAÚDE DA MULHER: ASSISTÊNCIA DE ENFERMAGEM",
+      "SAÚDE DO ADULTO",
+      "SAÚDE DO ADULTO: ASSISTÊNCIA DE ENFERMAGEM",
+      "SAÚDE DO IDOSO",
+      "SAÚDE DO IDOSO: ASSISTÊNCIA DE ENFERMAGEM",
+      "SAÚDE MENTAL E PSIQUIATRIA",
+      "SEGURANÇA DA INFORMAÇÃO",
+      "SISTEMAS DE INFORMAÇÃO GERENCIAL",
+      "SISTEMAS DE PLANEJAMENTO LOGÍSTICO",
+      "SISTEMAS DISTRIBUÍDOS",
+      "SISTEMAS EMBARCADOS",
+      "SISTEMAS ESTRUTURAIS",
+      "SISTEMAS OPERACIONAIS",
+      "SOCIOLOGIA DO TRABALHO",
+      "SOCORROS DE URGÊNCIA",
+      "SUBJETIVIDADE E SAÚDE MENTAL NAS INSTITUIÇÕES",
+      "TÉCNICA DIETÉTICA",
+      "TÉCNICAS DE CONSTRUÇÃO",
+      "TECNOLOGIA DA INFORMAÇÃO",
+      "TECNOLOGIA DA INFORMAÇÃO APLICADA À GESTÃO",
+      "TECNOLOGIA DOS ALIMENTOS",
+      "TECNOLOGIA EM FARMÁCIA HOMEOPÁTICA",
+      "TECNOLOGIA FARMACÊUTICA",
+      "TECNOLOGIAS NO ESPORTE",
+      "TEORIA DOS GRAFOS",
+      "TEORIAS DA ADMINISTRAÇÃO",
+      "TERAPIA COGNITIVA COMPORTAMENTAL",
+      "TERAPIA NUTRICIONAL",
+      "TERMOFOTOTERAPIA - INDICAÇÕES, BENEFÍCIOS E MÉTODOS",
+      "TESTES E HOMOLOGAÇÃO DE SOFTWARE",
+      "TEXTO E IMAGEM: LITERATURA INFANTOJUVENIL",
+      "TOPOGRAFIA E GEOPROCESSAMENTO",
+      "TOXICOLOGIA",
+      "TREINAMENTO DESPORTIVO: APLICAÇÃO",
+      "TREINAMENTO DESPORTIVO: CONCEITOS",
+      "URBANISMO",
+      "UROANÁLISE E FLUÍDOS CORPORAIS",
+      "USINAGEM E FERRAMENTAS DE CONFORMAÇÃO",
+      "VIGILÂNCIA EM SAÚDE",
+    ];
+
+    // Renderizar disciplinas
+    const container = document.getElementById("disciplinasContainer");
+    disciplinas.forEach((disciplina, index) => {
+      const div = document.createElement("div");
+      div.className = "flex items-center space-x-2";
+      
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = "disciplinas";
+      input.value = disciplina;
+      input.id = `disciplina-${index}`;
+      input.className = "h-4 w-4";
+      
+      const label = document.createElement("label");
+      label.htmlFor = `disciplina-${index}`;
+      const span = document.createElement("span");
+      span.textContent = disciplina;
+      label.appendChild(span);
+      
+      div.appendChild(input);
+      div.appendChild(label);
+      container.appendChild(div);
+    });
+
+    // Sistema de Busca
+    document.getElementById('buscaDisciplina').addEventListener('input', function(e) {
+      const termo = e.target.value.toLowerCase();
+      const disciplinasDivs = document.querySelectorAll('#disciplinasContainer > div');
+      
+      disciplinasDivs.forEach(div => {
+        const texto = div.textContent.toLowerCase();
+        div.style.display = texto.includes(termo) ? 'flex' : 'none';
+      });
+    });
+
+    // Contador de Disciplinas
+    function atualizarContador() {
+      const total = document.querySelectorAll('input[name="disciplinas"]:checked').length;
+      document.getElementById('contador').textContent = total;
+    }
+
+    document.querySelectorAll('input[name="disciplinas"]').forEach(checkbox => {
+      checkbox.addEventListener('change', atualizarContador);
+    });
+
+    // Alternar visualização
+    document.getElementById('toggleView').addEventListener('click', function() {
+      const container = document.getElementById('disciplinasContainer');
+      const showingAll = container.dataset.view !== 'selected';
+      
+      if(showingAll) {
+        container.dataset.view = 'selected';
+        this.textContent = 'Mostrar todas';
+        document.querySelectorAll('#disciplinasContainer > div').forEach(div => {
+          const checkbox = div.querySelector('input[type="checkbox"]');
+          div.style.display = checkbox.checked ? 'flex' : 'none';
+        });
+      } else {
+        container.dataset.view = 'all';
+        this.textContent = 'Mostrar apenas selecionadas';
+        document.querySelectorAll('#disciplinasContainer > div').forEach(div => {
+          div.style.display = 'flex';
+        });
+      }
+    });
+
+    // Validação do Formulário 
+    document.getElementById('disciplinasForm').addEventListener('submit', function(e) {
+      const checkboxes = document.querySelectorAll('input[name="disciplinas"]:checked');
+      
+      if(checkboxes.length === 0) {
+        e.preventDefault();
+        alert('Por favor, selecione pelo menos uma disciplina');
+        return;
+      }
+    });
+
+    // Persistência Local
+    document.querySelectorAll('#disciplinasForm input, #disciplinasForm textarea').forEach(input => {
+      input.addEventListener('input', function() {
+        const formData = new FormData(document.getElementById('disciplinasForm'));
+        const data = {};
+        formData.forEach((value, key) => {
+          if (key === 'disciplinas') {
+            data[key] = data[key] || [];
+            data[key].push(value);
+          } else {
+            data[key] = value;
+          }
+        });
+        localStorage.setItem('formAderencia', JSON.stringify(data));
+      });
+    });
+
+    window.addEventListener('load', function() {
+      const savedData = localStorage.getItem('formAderencia');
+      if(savedData) {
+        const data = JSON.parse(savedData);
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'disciplinas') {
+            // Marcar checkboxes salvos
+            value.forEach(val => {
+              const checkbox = document.querySelector(`input[name="disciplinas"][value="${val}"]`);
+              if(checkbox) checkbox.checked = true;
+            });
+          } else {
+            const element = document.querySelector(`[name="${key}"]`);
+            if(element) element.value = value;
+          }
+        });
+        atualizarContador();
+      }
+    });
+  </script>
+  
+  <script>
+    // Proteção contra inspeção (mantida do original)
+    document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener("keydown", function(e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
