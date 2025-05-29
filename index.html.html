@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#3b82f6" />
   <title>Formulário de Aderência de Disciplinas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -10,65 +11,92 @@
       font-weight: bold;
       color: #3b82f6;
     }
+    
+    /* Melhorias para mobile */
+    @media (max-width: 640px) {
+      #disciplinasContainer {
+        max-height: 300px;
+        padding: 0.5rem;
+      }
+      
+      .mobile-optimized-input {
+        font-size: 16px; /* Evita zoom automático no iOS */
+      }
+      
+      .mobile-optimized-button {
+        padding: 0.75rem;
+        font-size: 1rem;
+      }
+    }
+    
+    /* Melhorar acessibilidade do checkbox */
+    input[type="checkbox"] {
+      min-width: 20px;
+      min-height: 20px;
+    }
   </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl">
-    <h1 class="text-2xl font-bold mb-4 text-center">Formulário de Aderência de Disciplinas</h1>
-    <p class="text-gray-600 mb-4 text-center">Preencha com seus dados e selecione as disciplinas nas quais você tem aderência.</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+  <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-5xl">
+    <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center">Formulário de Aderência de Disciplinas</h1>
+    <p class="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 text-center">Preencha com seus dados e selecione as disciplinas nas quais você tem aderência.</p>
 
-    <form id="disciplinasForm" class="space-y-4" method="POST" action="https://formspree.io/f/meogyylp">
+    <form id="disciplinasForm" class="space-y-3 sm:space-y-4" method="POST" action="https://formspree.io/f/meogyylp">
       <input type="hidden" name="_subject" value="Nova resposta do Formulário de Aderência" />
 
       <div>
         <label for="nome" class="block text-sm font-medium text-gray-700">Nome completo</label>
-        <input type="text" id="nome" name="nome" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" />
+        <input type="text" id="nome" name="nome" required 
+               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300 mobile-optimized-input p-3" />
       </div>
 
       <div>
         <label for="formacao" class="block text-sm font-medium text-gray-700">Formações de Graduação</label>
-        <textarea id="formacao" name="formacao" required rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" placeholder="Ex: Engenharia Mecânica pela UNIFESP/UNIP/..., Licenciatura em Física pela UFSCar..."></textarea>
+        <textarea id="formacao" name="formacao" required rows="3" 
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300 mobile-optimized-input p-3" 
+                  placeholder="Ex: Engenharia Mecânica pela UNIFESP/UNIP/..., Licenciatura em Física pela UFSCar..."></textarea>
       </div>
 
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700">Seu e-mail (opcional)</label>
-        <input type="email" id="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300" />
+        <input type="email" id="email" name="email" 
+               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-300 mobile-optimized-input p-3" />
       </div>
 
-      <!-- Sistema de Busca (Melhoria 2) -->
-      <div class="mb-4">
+      <!-- Sistema de Busca -->
+      <div class="mb-3 sm:mb-4">
         <input type="text" id="buscaDisciplina" placeholder="Buscar disciplina..." 
-               class="w-full p-2 border rounded-md">
+               class="w-full p-3 border rounded-md mobile-optimized-input">
       </div>
 
-      <!-- Contador de Disciplinas (Melhoria 5) -->
-      <div class="text-sm text-gray-500 mb-2">
-        <span id="contador">0</span> disciplinas selecionadas
+      <!-- Contador de Disciplinas e Botão de Alternar -->
+      <div class="flex justify-between items-center mb-2">
+        <div class="text-sm text-gray-500">
+          <span id="contador">0</span> disciplinas selecionadas
+        </div>
+        <button type="button" id="toggleView" class="text-sm text-blue-600 hover:text-blue-800">
+          Mostrar apenas selecionadas
+        </button>
       </div>
 
-      <!-- Botão para alternar visualização (Melhoria 7) -->
-      <button type="button" id="toggleView" class="mb-2 text-sm text-blue-600">
-        Mostrar apenas selecionadas
-      </button>
-
-      <div class="grid grid-cols-1 gap-2 max-h-[500px] overflow-y-auto p-4 border border-gray-200 rounded bg-gray-50" id="disciplinasContainer">
+      <div class="grid grid-cols-1 gap-2 max-h-[400px] sm:max-h-[500px] overflow-y-auto p-2 sm:p-4 border border-gray-200 rounded bg-gray-50" id="disciplinasContainer">
         <!-- Disciplinas serão inseridas aqui pelo JavaScript -->
       </div>
 
-      <button type="submit" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+      <button type="submit" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded mobile-optimized-button">
         Enviar
       </button>
 
-      <p class="text-sm text-gray-500 mt-2 text-center">Você receberá uma confirmação por e-mail após o envio.</p>
+      <p class="text-xs sm:text-sm text-gray-500 mt-2 text-center">Você receberá uma confirmação por e-mail após o envio.</p>
       
       <!-- Créditos do desenvolvedor -->
-      <p class="text-xs text-gray-400 mt-4 text-center">Desenvolvido por Dr. Antonio Carlos de Oliveira Cruz Junior</p>
+      <p class="text-xs text-gray-400 mt-3 text-center">Desenvolvido por Dr. Antonio Carlos de Oliveira Cruz Junior</p>
     </form>
   </div>
 
   <script>
     const disciplinas = [
-      "ADMINISTRAÇÃO DA PRODUÇÃO",
+            "ADMINISTRAÇÃO DA PRODUÇÃO",
       "ADMINISTRAÇÃO DE MATERIAIS",
       "ADMINISTRAÇÃO DE UNIDADES DE ALIMENTAÇÃO E NUTRIÇÃO",
       "ADMINISTRAÇÃO E ESCALABILIDADE EM BANCO DE DADOS",
@@ -484,25 +512,29 @@
       "UROANÁLISE E FLUÍDOS CORPORAIS",
       "USINAGEM E FERRAMENTAS DE CONFORMAÇÃO",
       "VIGILÂNCIA EM SAÚDE",
+      // ... (mantenha a lista original de disciplinas)
     ];
 
-    // Renderizar disciplinas
+    // Renderizar disciplinas com melhor acessibilidade
     const container = document.getElementById("disciplinasContainer");
     disciplinas.forEach((disciplina, index) => {
       const div = document.createElement("div");
-      div.className = "flex items-center space-x-2";
+      div.className = "flex items-center space-x-3 p-2 hover:bg-gray-100 rounded";
       
       const input = document.createElement("input");
       input.type = "checkbox";
       input.name = "disciplinas";
       input.value = disciplina;
       input.id = `disciplina-${index}`;
-      input.className = "h-4 w-4";
+      input.className = "h-5 w-5 flex-shrink-0";
+      input.setAttribute("aria-label", `Selecionar disciplina ${disciplina}`);
       
       const label = document.createElement("label");
       label.htmlFor = `disciplina-${index}`;
+      label.className = "flex-1"; // Ocupa todo o espaço disponível
       const span = document.createElement("span");
       span.textContent = disciplina;
+      span.className = "text-sm sm:text-base"; // Tamanho de fonte responsivo
       label.appendChild(span);
       
       div.appendChild(input);
@@ -510,8 +542,9 @@
       container.appendChild(div);
     });
 
-    // Sistema de Busca
-    document.getElementById('buscaDisciplina').addEventListener('input', function(e) {
+    // Sistema de Busca otimizado para mobile
+    const buscaInput = document.getElementById('buscaDisciplina');
+    buscaInput.addEventListener('input', function(e) {
       const termo = e.target.value.toLowerCase();
       const disciplinasDivs = document.querySelectorAll('#disciplinasContainer > div');
       
@@ -519,6 +552,9 @@
         const texto = div.textContent.toLowerCase();
         div.style.display = texto.includes(termo) ? 'flex' : 'none';
       });
+      
+      // Atualizar contador após busca
+      atualizarContador();
     });
 
     // Contador de Disciplinas
@@ -527,11 +563,22 @@
       document.getElementById('contador').textContent = total;
     }
 
-    document.querySelectorAll('input[name="disciplinas"]').forEach(checkbox => {
-      checkbox.addEventListener('change', atualizarContador);
+    // Usar event delegation para melhor performance em mobile
+    container.addEventListener('change', function(e) {
+      if (e.target.matches('input[name="disciplinas"]')) {
+        atualizarContador();
+        
+        // Se estiver no modo "mostrar apenas selecionadas", atualizar a exibição
+        if (container.dataset.view === 'selected') {
+          const div = e.target.closest('div');
+          div.style.display = e.target.checked ? 'flex' : 'none';
+        }
+        
+        salvarDadosLocalmente();
+      }
     });
 
-    // Alternar visualização
+    // Alternar visualização otimizado para mobile
     document.getElementById('toggleView').addEventListener('click', function() {
       const container = document.getElementById('disciplinasContainer');
       const showingAll = container.dataset.view !== 'selected';
@@ -550,64 +597,111 @@
           div.style.display = 'flex';
         });
       }
+      
+      // Manter o foco na busca após alternar
+      if (buscaInput.value) {
+        buscaInput.focus();
+      }
     });
 
-    // Validação do Formulário 
+    // Validação do Formulário com feedback melhor
     document.getElementById('disciplinasForm').addEventListener('submit', function(e) {
       const checkboxes = document.querySelectorAll('input[name="disciplinas"]:checked');
       
       if(checkboxes.length === 0) {
         e.preventDefault();
-        alert('Por favor, selecione pelo menos uma disciplina');
+        // Feedback mais amigável que um alert
+        const feedback = document.createElement('div');
+        feedback.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded';
+        feedback.innerHTML = '<p>Por favor, selecione pelo menos uma disciplina antes de enviar.</p>';
+        
+        const existingFeedback = document.querySelector('.form-feedback');
+        if (existingFeedback) {
+          existingFeedback.replaceWith(feedback);
+        } else {
+          container.parentNode.insertBefore(feedback, container);
+        }
+        feedback.classList.add('form-feedback');
+        
+        // Rolagem suave para o feedback
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
     });
 
-    // Persistência Local
-    document.querySelectorAll('#disciplinasForm input, #disciplinasForm textarea').forEach(input => {
-      input.addEventListener('input', function() {
-        const formData = new FormData(document.getElementById('disciplinasForm'));
-        const data = {};
-        formData.forEach((value, key) => {
-          if (key === 'disciplinas') {
-            data[key] = data[key] || [];
-            data[key].push(value);
-          } else {
-            data[key] = value;
-          }
-        });
-        localStorage.setItem('formAderencia', JSON.stringify(data));
+    // Persistência Local otimizada
+    function salvarDadosLocalmente() {
+      const formData = new FormData(document.getElementById('disciplinasForm'));
+      const data = {};
+      formData.forEach((value, key) => {
+        if (key === 'disciplinas') {
+          data[key] = data[key] || [];
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
       });
+      localStorage.setItem('formAderencia', JSON.stringify(data));
+    }
+
+    // Usar event delegation para campos de texto
+    document.getElementById('disciplinasForm').addEventListener('input', function(e) {
+      if (e.target.matches('input[type="text"], input[type="email"], textarea')) {
+        salvarDadosLocalmente();
+      }
     });
 
+    // Carregar dados salvos com verificação
     window.addEventListener('load', function() {
       const savedData = localStorage.getItem('formAderencia');
       if(savedData) {
-        const data = JSON.parse(savedData);
-        Object.entries(data).forEach(([key, value]) => {
-          if (key === 'disciplinas') {
-            // Marcar checkboxes salvos
-            value.forEach(val => {
-              const checkbox = document.querySelector(`input[name="disciplinas"][value="${val}"]`);
-              if(checkbox) checkbox.checked = true;
-            });
-          } else {
-            const element = document.querySelector(`[name="${key}"]`);
-            if(element) element.value = value;
-          }
-        });
-        atualizarContador();
+        try {
+          const data = JSON.parse(savedData);
+          Object.entries(data).forEach(([key, value]) => {
+            if (key === 'disciplinas') {
+              value.forEach(val => {
+                const checkbox = document.querySelector(`input[name="disciplinas"][value="${val}"]`);
+                if(checkbox) checkbox.checked = true;
+              });
+            } else {
+              const element = document.querySelector(`[name="${key}"]`);
+              if(element) element.value = value;
+            }
+          });
+          atualizarContador();
+        } catch (e) {
+          console.error('Erro ao carregar dados salvos:', e);
+          localStorage.removeItem('formAderencia');
+        }
       }
+      
+      // Focar no primeiro campo ao carregar em mobile
+      if (window.innerWidth < 640) {
+        document.getElementById('nome')?.focus();
+      }
+    });
+
+    // Melhorar acessibilidade do teclado virtual em mobile
+    document.querySelectorAll('input, textarea, button').forEach(el => {
+      el.addEventListener('focus', function() {
+        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     });
   </script>
   
   <script>
-    // Proteção contra inspeção (mantida do original)
+    // Proteção contra inspeção (modificada para não interferir com acessibilidade)
     document.addEventListener("contextmenu", function(e) {
-      e.preventDefault();
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
     });
+    
     document.addEventListener("keydown", function(e) {
-      if (
+      // Permitir atalhos de acessibilidade
+      const isAccessibilityShortcut = e.altKey || e.ctrlKey && e.key === 'Tab';
+      
+      if (!isAccessibilityShortcut && (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
         (e.ctrlKey && e.key === 'U')
